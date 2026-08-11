@@ -107,7 +107,7 @@
 </head>
 <body>
 
-<div class="notice">Proof of concept — placeholder 3D model, for testing AR mechanism only</div>
+<div class="notice">Proof of concept — true-scale box model (12.5in x 6in), not the final Capsule scan</div>
 
 <div class="hero">
   <div class="eyebrow">TuxMat Capsule&trade;</div>
@@ -115,15 +115,15 @@
   <div class="price">Placeholder — not final pricing</div>
 
   <model-viewer
-    src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
-    ios-src="https://modelviewer.dev/shared-assets/models/Astronaut.usdz"
+    src="capsule_placeholder.glb"
+    ios-src="capsule_placeholder.usdz"
     ar
     ar-modes="webxr scene-viewer quick-look"
     camera-controls
     auto-rotate
     shadow-intensity="1"
     exposure="0.9"
-    alt="Placeholder 3D model for AR testing">
+    alt="Placeholder scale model of TuxMat Capsule for AR testing">
     <button slot="ar-button" class="pill pill-primary" style="position: static; width: 100%;">
       View in AR
     </button>
@@ -134,7 +134,7 @@
   </div>
 
   <p class="desc">
-    Tap "View in AR" on your phone to place this model against a real surface at true scale. This build swaps in a placeholder object purely to test whether the AR launch, camera anchoring, and fallback 3D view work reliably on your device before any Capsule scan is commissioned.
+    Tap "View in AR" on your phone to place this at true scale, 12.5in wide by 6in tall, against your own bumper and plate. This is a flat box textured with the Capsule reference image, not a scan of the real product, so treat the shape and depth as approximate. The point of this test is anchoring accuracy and scale against a real plate area, not final visual fidelity.
   </p>
 
   <div class="proof">
