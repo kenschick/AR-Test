@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TuxMat Capsule — manual placement test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    font-family: 'Poppins', Arial, sans-serif;
+    background: #000000;
+    color: #FFFFFF;
+  }
+  #stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    touch-action: none;
+  }
+  #camera {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: #111111;
+  }
+  #overlay {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 260px;
+    height: 124.8px;
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+    pointer-events: none;
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,0.5));
+  }
+  #overlay img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .notice {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    background: #B9975B;
+    color: #000000;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    padding: 8px 12px;
+    letter-spacing: 0.02em;
+    z-index: 10;
+  }
+  .hud {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    z-index: 10;
+    padding: 16px 20px 28px;
+    background: linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0));
+  }
+  .hud-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #DFBA7C;
+    margin-bottom: 4px;
+    letter-spacing: 0.02em;
+  }
+  .hud-sub {
+    font-size: 12px;
+    font-weight: 300;
+    color: #C9C9C9;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+  .hud-row {
+    display: flex;
+    gap: 10px;
+  }
+  .btn {
+    flex: 1;
+    height: 44px;
+    border-radius: 999px;
+    border: 1px solid #5A5A5A;
+    background: rgba(255,255,255,0.06);
+    color: #FFFFFF;
+    font-family: 'Poppins', Arial, sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+  }
+  .btn-primary {
+    background: #B9975B;
+    color: #000000;
+    border: none;
+  }
+  #start-screen {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: #000000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    text-align: center;
+  }
+  #start-screen h1 {
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  #start-screen p {
+    font-size: 14px;
+    font-weight: 300;
+    color: #C9C9C9;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    max-width: 320px;
+  }
+  #start-btn {
+    width: 220px;
+    height: 52px;
+    border-radius: 999px;
+    background: #B9975B;
+    color: #000000;
+    border: none;
+    font-family: 'Poppins', Arial, sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+  }
+  #error-msg {
+    font-size: 13px;
+    color: #E24B4A;
+    margin-top: 16px;
+    max-width: 300px;
+  }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="start-screen">
+  <h1>Capsule manual placement test</h1>
+  <p>This opens your rear camera. Drag with one finger to move Capsule into place over your plate, pinch with two fingers to resize, and twist with two fingers to rotate. The shape stays locked to Capsule&rsquo;s true 12.5in by 6in ratio.</p>
+  <button id="start-btn">Start camera</button>
+  <div id="error-msg" class="hidden"></div>
+</div>
+
+<div id="stage" class="hidden">
+  <div class="notice">Manual placement test — not automatic plate tracking</div>
+  <video id="camera" autoplay playsinline muted></video>
+  <div id="overlay">
+    <img src="capsule_tex_final.png" alt="Capsule placeholder overlay">
+  </div>
+  <div class="hud">
+    <div class="hud-title">Fit Capsule to your plate</div>
+    <div class="hud-sub">Drag to move &middot; pinch to resize &middot; twist to rotate</div>
+    <div class="hud-row">
+      <button class="btn" id="reset-btn">Reset position</button>
+      <button class="btn btn-primary" id="hide-btn">Hide controls</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const startScreen = document.getElementById('start-screen');
+const startBtn = document.getElementById('start-btn');
+const errorMsg = document.getElementById('error-msg');
+const stage = document.getElementById('stage');
+const cameraEl = document.getElementById('camera');
+const overlay = document.getElementById('overlay');
+const resetBtn = document.getElementById('reset-btn');
+const hideBtn = document.getElementById('hide-btn');
+const hud = document.querySelector('.hud');
+
+const ASPECT = 6.0 / 12.5;
+let state = { x: 0, y: 0, scale: 1, rotation: 0 };
+let baseWidth = 260;
+
+function applyTransform() {
+  overlay.style.transform =
+    'translate(-50%, -50%) translate(' + state.x + 'px, ' + state.y + 'px) rotate(' + state.rotation + 'deg) scale(' + state.scale + ')';
+}
+
+function resetState() {
+  state = { x: 0, y: 0, scale: 1, rotation: 0 };
+  applyTransform();
+}
+
+resetBtn.addEventListener('click', resetState);
+
+let controlsVisible = true;
+hideBtn.addEventListener('click', () => {
+  controlsVisible = !controlsVisible;
+  hud.style.display = controlsVisible ? 'block' : 'none';
+  hideBtn.textContent = controlsVisible ? 'Hide controls' : 'Show controls';
+});
+
+startBtn.addEventListener('click', async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' } },
+      audio: false
+    });
+    cameraEl.srcObject = stream;
+    startScreen.classList.add('hidden');
+    stage.classList.remove('hidden');
+    overlay.style.width = baseWidth + 'px';
+    overlay.style.height = (baseWidth * ASPECT) + 'px';
+    applyTransform();
+  } catch (err) {
+    errorMsg.textContent = 'Camera access failed: ' + err.message + '. Check that you allowed camera permission and are on https.';
+    errorMsg.classList.remove('hidden');
+  }
+});
+
+let pointers = new Map();
+let gestureStart = null;
+
+function dist(p1, p2) {
+  return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+}
+function angleOf(p1, p2) {
+  return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+}
+
+stage.addEventListener('pointerdown', (e) => {
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pointers.size === 1) {
+    const p = Array.from(pointers.values())[0];
+    gestureStart = { mode: 'pan', startX: p.x, startY: p.y, origX: state.x, origY: state.y };
+  } else if (pointers.size === 2) {
+    const [p1, p2] = Array.from(pointers.values());
+    gestureStart = {
+      mode: 'transform',
+      startDist: dist(p1, p2),
+      startAngle: angleOf(p1, p2),
+      origScale: state.scale,
+      origRotation: state.rotation
+    };
+  }
+});
+
+stage.addEventListener('pointermove', (e) => {
+  if (!pointers.has(e.pointerId)) return;
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+  if (pointers.size === 1 && gestureStart && gestureStart.mode === 'pan') {
+    const p = Array.from(pointers.values())[0];
+    state.x = gestureStart.origX + (p.x - gestureStart.startX);
+    state.y = gestureStart.origY + (p.y - gestureStart.startY);
+    applyTransform();
+  } else if (pointers.size === 2 && gestureStart && gestureStart.mode === 'transform') {
+    const [p1, p2] = Array.from(pointers.values());
+    const newDist = dist(p1, p2);
+    const newAngle = angleOf(p1, p2);
+    state.scale = Math.max(0.2, Math.min(4, gestureStart.origScale * (newDist / gestureStart.startDist)));
+    state.rotation = gestureStart.origRotation + (newAngle - gestureStart.startAngle);
+    applyTransform();
+  }
+});
+
+function endPointer(e) {
+  pointers.delete(e.pointerId);
+  if (pointers.size === 1) {
+    const p = Array.from(pointers.values())[0];
+    gestureStart = { mode: 'pan', startX: p.x, startY: p.y, origX: state.x, origY: state.y };
+  } else if (pointers.size === 0) {
+    gestureStart = null;
+  }
+}
+
+stage.addEventListener('pointerup', endPointer);
+stage.addEventListener('pointercancel', endPointer);
+stage.addEventListener('pointerleave', endPointer);
+</script>
+
+</body>
+</html>
