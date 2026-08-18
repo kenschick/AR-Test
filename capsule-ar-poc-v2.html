@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TuxMat Capsule — AR proof of concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/model-viewer/4.1.0/model-viewer.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background: #000000;
+    color: #FFFFFF;
+  }
+  .notice {
+    background: #B9975B;
+    color: #000000;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    padding: 10px 16px;
+    letter-spacing: 0.02em;
+  }
+  .hero {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 32px 24px 40px;
+  }
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #DFBA7C;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Poppins', Arial, sans-serif;
+    font-weight: 500;
+    font-size: 28px;
+    line-height: 1.25;
+    margin-bottom: 12px;
+  }
+  .price {
+    font-size: 18px;
+    font-weight: 300;
+    color: #DBDCDD;
+    margin-bottom: 24px;
+  }
+  model-viewer {
+    width: 100%;
+    height: 360px;
+    background: #0D0D0D;
+    border: 1px solid #2A2A2A;
+    border-radius: 4px;
+    --poster-color: transparent;
+  }
+  .cta-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 52px;
+    border-radius: 999px;
+    font-family: 'Poppins', Arial, sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+  }
+  .pill-primary {
+    background: #B9975B;
+    color: #000000;
+  }
+  .pill-secondary {
+    background: transparent;
+    color: #FFFFFF;
+    border: 1px solid #5A5A5A;
+  }
+  .desc {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: #C9C9C9;
+    margin: 24px 0;
+  }
+  .proof {
+    border-top: 1px solid #2A2A2A;
+    padding-top: 20px;
+    display: flex;
+    gap: 24px;
+    font-size: 12px;
+    color: #8A8A8A;
+  }
+  .proof span { display: block; color: #FFFFFF; font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+</style>
+</head>
+<body>
+
+<div class="notice">Real Capsule model — testing AR placement, not final product photography</div>
+
+<div class="hero">
+  <div class="eyebrow">TuxMat Capsule&trade;</div>
+  <h1>See it on your car before you buy it</h1>
+  <model-viewer
+    src="real_capsule.glb"
+    ios-src="real_capsule.usdz"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    ar-placement="wall"
+    ar-scale="fixed"
+    orientation="0deg 0deg 180deg"
+    camera-controls
+    auto-rotate
+    shadow-intensity="1"
+    exposure="0.9"
+    alt="TuxMat Capsule License Plate Case, true scale">
+    <button slot="ar-button" class="pill pill-primary" style="position: static; width: 100%;">
+      View in AR
+    </button>
+  </model-viewer>
+
+  <div class="cta-row">
+    <button class="pill pill-secondary">Rotate to explore</button>
+  </div>
+
+  <p class="desc">
+    Tap "View in AR" on your phone to place the real Capsule assembly at true scale against a surface. This is your actual production model — frame, backplate, clear cover, hardware, and plate detail — so this is the real test of fit, proportion, and presence, not just the AR mechanism.
+  </p>
+
+  <div class="proof">
+    <div><span>iOS</span>AR Quick Look</div>
+    <div><span>Android</span>WebXR / Scene Viewer</div>
+    <div><span>Desktop</span>3D turntable fallback</div>
+  </div>
+</div>
+
+</body>
+</html>
